@@ -1,0 +1,66 @@
+import sqlalchemy as sq
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
+from models import Publisher, Book, Shop, Stock, Sale, create_tables
+
+DSN = "postgresql://postgres:postgres@localhost:5432/postgres"
+engine = sq.create_engine(DSN)
+
+create_tables(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+
+publisher_1 = Publisher(name="АСТ")
+publisher_2 = Publisher(name="Эксмо")
+publisher_3 = Publisher(name="Азбука")
+publisher_4 = Publisher(name="Питер")
+session.add_all([publisher_1, publisher_2, publisher_3, publisher_4])
+
+shop_1 = Shop(name="Читай-город")
+shop_2 = Shop(name="Буквоед")
+shop_3 = Shop(name="Лабиринт")
+shop_4 = Shop(name="Ozon")
+session.add_all([shop_1, shop_2, shop_3, shop_4])
+
+book_1 = Book(title="Тестирование JavaScript", id_publisher=4)
+book_2 = Book(title="Kotlin. Программирование для профессионалов. 2-е", id_publisher=4)
+book_3 = Book(title="Дар", id_publisher=1)
+book_4 = Book(title="Букварь", id_publisher=2)
+book_5 = Book(title="Тьма после рассвета", id_publisher=2)
+book_6 = Book(title="Король былого и грядущего", id_publisher=3)
+session.add_all([book_1, book_2, book_3, book_4, book_5, book_6])
+
+stock_1 = Stock(id_shop=1, id_book=1, count=100)
+stock_2 = Stock(id_shop=1, id_book=2, count=200)
+stock_3 = Stock(id_shop=2, id_book=3, count=300)
+stock_4 = Stock(id_shop=2, id_book=4, count=400)
+stock_5 = Stock(id_shop=3, id_book=5, count=500)
+stock_6 = Stock(id_shop=3, id_book=6, count=600)
+stock_7 = Stock(id_shop=4, id_book=1, count=700)
+stock_8 = Stock(id_shop=4, id_book=2, count=800)
+stock_9 = Stock(id_shop=4, id_book=3, count=900)
+session.add_all([stock_1, stock_2, stock_3, stock_4, stock_5, stock_6, stock_7, stock_8, stock_9])
+
+sale_1 = Sale(price=1000.99, date_sale="2022-01-01", id_stock=1, count=10)
+sale_2 = Sale(price=2000.99, date_sale="2022-02-02", id_stock=2, count=20)
+sale_3 = Sale(price=300.99, date_sale="2022-03-01", id_stock=3, count=30)
+sale_4 = Sale(price=400.99, date_sale="2022-04-02", id_stock=4, count=40)
+sale_5 = Sale(price=500.99, date_sale="2022-05-01", id_stock=5, count=50)
+sale_6 = Sale(price=600.99, date_sale="2022-06-09", id_stock=6, count=60)
+sale_7 = Sale(price=700.99, date_sale="2022-07-18", id_stock=7, count=70)
+sale_8 = Sale(price=800.99, date_sale="2022-08-17", id_stock=8, count=80)
+sale_9 = Sale(price=900.99, date_sale="2022-09-16", id_stock=9, count=90)
+session.add_all([sale_1, sale_2, sale_3, sale_4, sale_5, sale_6, sale_7, sale_8, sale_9])
+
+session.commit()
+session.close()
+
+
+# Выводит издателя (publisher), имя или идентификатор которого принимается через input()
+q = session.query(Publisher).filter(Publisher.name == input("Введите название издателя: "))
+for s in q.all():
+    print(s.id, s.name)
+
+q = session.query(Publisher).filter(Publisher.id == input("Введите идентификатор издателя: "))
+for s in q.all():
+    print(s.id, s.name)
